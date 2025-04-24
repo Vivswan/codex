@@ -281,17 +281,19 @@ const createCompletion = (openai: OpenAI, input: ResponseCreateInput) => {
       ? "auto"
       : input.tool_choice) as OpenAI.Chat.Completions.ChatCompletionCreateParams["tool_choice"],
     stream: input.stream || false,
+    stream_options: {"include_usage": true},
     user: input.user,
     metadata: input.metadata,
   };
 
+  console.log("$$$$$$$$$$$");
   return openai.chat.completions.create(chatInput);
 };
 
 // Main function with overloading
 async function responsesCreateViaChatCompletions(
   openai: OpenAI,
-  input: ResponseCreateInput & { stream: true },
+  input: ResponseCreateInput & { stream: true, stream_options: {"include_usage": true} },
 ): Promise<AsyncGenerator<ResponseEvent>>;
 async function responsesCreateViaChatCompletions(
   openai: OpenAI,

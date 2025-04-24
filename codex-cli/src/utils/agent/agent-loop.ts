@@ -668,13 +668,14 @@ export class AgentLoop {
             const responseCall =
               !this.config.provider ||
               this.config.provider?.toLowerCase() === "openai"
-                ? (params: ResponseCreateParams) =>
-                    this.oai.responses.create(params)
-                : (params: ResponseCreateParams) =>
-                    responsesCreateViaChatCompletions(
+                ? (params: ResponseCreateParams & { stream: true, stream_options: {"include_usage": true} }) =>
+                    { return this.oai.responses.create(params)}
+                : (params: ResponseCreateParams & { stream: true, stream_options: {"include_usage": true} }) =>{
+                    return responsesCreateViaChatCompletions(
                       this.oai,
-                      params as ResponseCreateParams & { stream: true },
+                      params as ResponseCreateParams & { stream: true, stream_options: {"include_usage": true} },
                     );
+                  }
             log(
               `instructions (length ${mergedInstructions.length}): ${mergedInstructions}`,
             );
@@ -685,6 +686,7 @@ export class AgentLoop {
               instructions: mergedInstructions,
               input: turnInput,
               stream: true,
+              stream_options: {"include_usage": true},
               parallel_tool_calls: false,
               reasoning,
               ...(this.config.flexMode ? { service_tier: "flex" } : {}),
@@ -924,6 +926,7 @@ export class AgentLoop {
               }
 
               if (event.type === "response.completed") {
+                console.log(JSON.stringify(event.response));
                 if (thisGeneration === this.generation && !this.canceled) {
                   for (const item of event.response.output) {
                     stageItem(item as ResponseItem);
@@ -1036,13 +1039,13 @@ export class AgentLoop {
               const responseCall =
                 !this.config.provider ||
                 this.config.provider?.toLowerCase() === "openai"
-                  ? (params: ResponseCreateParams) =>
-                      this.oai.responses.create(params)
-                  : (params: ResponseCreateParams) =>
-                      responsesCreateViaChatCompletions(
+                  ? (params: ResponseCreateParams & { stream: true, stream_options: {"include_usage": true} }) =>
+                      { return this.oai.responses.create(params)}
+                  : (params: ResponseCreateParams & { stream: true, stream_options: {"include_usage": true} }) =>{
+                      return responsesCreateViaChatCompletions(
                         this.oai,
-                        params as ResponseCreateParams & { stream: true },
-                      );
+                        params as ResponseCreateParams & { stream: true, stream_options: {"include_usage": true} },
+                      );}
 
               log(
                 "agentLoop.run(): responseCall(1): turnInput: " +
@@ -1054,6 +1057,7 @@ export class AgentLoop {
                 instructions: mergedInstructions,
                 input: turnInput,
                 stream: true,
+                stream_options: {"include_usage": true},
                 parallel_tool_calls: false,
                 reasoning,
                 ...(this.config.flexMode ? { service_tier: "flex" } : {}),

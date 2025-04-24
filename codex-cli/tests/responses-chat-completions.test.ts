@@ -13,7 +13,7 @@ import type {
 } from "openai/resources/responses/responses";
 
 // Define specific types for streaming and non-streaming params
-type ResponseCreateParamsStreaming = ResponseCreateParams & { stream: true };
+type ResponseCreateParamsStreaming = ResponseCreateParams & { stream: true, stream_options: {"include_usage": true}  };
 type ResponseCreateParamsNonStreaming = ResponseCreateParams & {
   stream?: false;
 };
@@ -687,7 +687,7 @@ describe("responsesCreateViaChatCompletions", () => {
       const inputMessage = createTestInput({
         model: "gpt-4o",
         userMessage: "Say hello",
-        stream: true,
+        stream: true
       });
 
       const streamGenerator =
